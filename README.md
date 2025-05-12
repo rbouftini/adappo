@@ -71,14 +71,14 @@ Follow these steps to get up and running:
 ppoh/
 ├── .dockerignore
 ├── .gitignore
-├── ContinuousAgent.py # Agent for continuous-action environments
-├── DiscreteAgent.py # Agent for discrete-action environments
-├── Dockerfile # Docker instructions file
-├── README.md # (this file)
-├── new.py # New PPO algorithm implementation
-├── ppo.py # PPO implementation
-├── requirements.txt # Python dependencies
-└── run.py # Script for running experiments
+├── ContinuousAgent.py      # Agent for continuous-action environments
+├── DiscreteAgent.py        # Agent for discrete-action environments
+├── Dockerfile              # Docker instructions file
+├── README.md               # (this file)
+├── new.py                  # PPOH-specific algorithm implementation
+├── ppo.py                  # Vanilla PPO implementation
+├── requirements.txt        # Python dependencies
+└── run.py                  # Script for running experiments
 ```
 
 ## License
