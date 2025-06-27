@@ -14,7 +14,7 @@ class DiscretePolicy(nn.Module):
         super().__init__()
         self.l1 = layer_init(nn.Linear(envs.single_observation_space.shape[0], 64, bias=True))  # Input is 8 dimentional (8 states)
         self.l2 = layer_init(nn.Linear(64, 64, bias=True))
-        self.l3 = layer_init(nn.Linear(64, envs.single_action_space.shape[0], bias=True), std=0.01)  # Output layer (4 possible actions)
+        self.l3 = layer_init(nn.Linear(64, envs.single_action_space.n, bias=True), std=0.01)  # Output layer (4 possible actions)
 
     def forward(self, x):
         x = F.relu(self.l1(x))
