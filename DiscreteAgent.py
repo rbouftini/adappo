@@ -158,6 +158,6 @@ class DiscreteAgent(ABC):
             self.optimizer_policy.param_groups[0]['lr'] = lr
             print(f"Episode: {episode+1}, Total Rewards: {total_rewards}, lr:{lr:.4e}")
 
-            self.update_policy_value(b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs=100)
+            self.update_policy_value(b_actions, b_states, b_logprobs, b_advantages, b_rewards)
 
         return saved_rewards

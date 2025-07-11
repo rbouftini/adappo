@@ -11,7 +11,6 @@ import argparse
 import new
 import ppo
 import warnings
-warnings.filterwarnings("ignore", message="CUDA initialization: Found no NVIDIA driver on your system")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--alg", help="Testing Algorithm", 
@@ -21,16 +20,28 @@ parser.add_argument("--env", help="Environment id (eg. LunarLander-v3)",
 parser.add_argument("--num-eps", help="Number of episodes",
                     default="100", type=int)
 args = parser.parse_args()
-env = gym.make(args.env)
+warnings.filterwarnings("ignore", message="CUDA initialization: Found no NVIDIA driver on your system")
+
+def make_wrapped_env():
+    def _init():
+        env = gym.make(args.env, render_mode="rgb_array")
+        env = gym.wrappers.ClipAction(env)
+        env = gym.wrappers.NormalizeObservation(env)
+        env = gym.wrappers.TransformObservation(env, lambda obs: np.clip(obs, -10, 10),
+                                                observation_space= env.observation_space)
+
+        return env
+    return _init
 
 rewards = []
 print(f"Running {args.alg.upper()} on {args.env} task for {args.num_eps} episodes")
+num_envs = 8
 np.random.seed(42)
 seeds = np.random.randint(1000, size=4)
 
 for seed in seeds:
-  num_envs = 8
-  envs = gym.make_vec(args.env, num_envs=num_envs, vectorization_mode="sync", render_mode="rgb_array")
+  env_fns = [make_wrapped_env() for i in range(num_envs)]
+  envs = gym.vector.SyncVectorEnv(env_fns)
   _ = envs.reset(seed=[int(seed) + i for i in range(num_envs)])
   torch.manual_seed(seed)
   

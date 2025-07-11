@@ -17,7 +17,7 @@ def create_agent(envs):
     def __init__(self, envs, policy, value):
       super().__init__(envs, policy, value)
 
-    def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs):
+    def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs=100):
       for epoch in range(epochs):
         policy_loss = 0
         value_loss = 0
