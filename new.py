@@ -47,7 +47,7 @@ def create_agent(envs):
           rewards, new_values = rewards[perm], new_values[perm]
           value_loss += F.mse_loss(rewards.unsqueeze(1), new_values) / len(b_actions)
 
-        if avg_kl <= 10:
+        if avg_kl <= 3:
           # Backpropagate and update policy network
           self.optimizer_policy.zero_grad()
           policy_loss.backward()
@@ -59,5 +59,5 @@ def create_agent(envs):
         value_loss.backward()
         nn.utils.clip_grad_norm_(self.value.parameters(), 1)
         self.optimizer_value.step()
-
+  
   return NewAgent(envs, policy, value), policy, value 

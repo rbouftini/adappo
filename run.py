@@ -25,12 +25,13 @@ env = gym.make(args.env)
 
 rewards = []
 print(f"Running {args.alg.upper()} on {args.env} task for {args.num_eps} episodes")
-seeds = [562, 717, 319, 749]
+np.random.seed(42)
+seeds = np.random.randint(1000, size=4)
 
 for seed in seeds:
   num_envs = 8
   envs = gym.make_vec(args.env, num_envs=num_envs, vectorization_mode="sync", render_mode="rgb_array")
-  _ = envs.reset(seed= [int(seed )+ i for i in range(num_envs)])
+  _ = envs.reset(seed=[int(seed) + i for i in range(num_envs)])
   torch.manual_seed(seed)
   
   if args.alg == "new":

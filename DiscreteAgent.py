@@ -17,8 +17,8 @@ class DiscretePolicy(nn.Module):
         self.l3 = layer_init(nn.Linear(64, envs.single_action_space.n, bias=True), std=0.01)  # Output layer (4 possible actions)
 
     def forward(self, x):
-        x = F.relu(self.l1(x))
-        x = F.relu(self.l2(x))
+        x = torch.tanh(self.l1(x))
+        x = torch.tanh(self.l2(x))
         x = self.l3(x)
         return F.softmax(x, dim=1)  # Output a probability distribution over actions
 
@@ -107,7 +107,7 @@ class DiscreteAgent(ABC):
         return b_advantages, b_returns
 
     def collect_trajectories(self, num_envs):
-        observations, info = self.env.reset(seed=42)
+        observations, info = self.env.reset()
         b_actions = [[] for _ in range(num_envs)]
         b_states = [[] for _ in range(num_envs)]
         b_rewards = [[] for _ in range(num_envs)]

@@ -114,7 +114,7 @@ class ContinuousAgent(ABC):
 
 
     def collect_trajectories(self, num_envs):
-        observations, info = self.env.reset(seed=42)
+        observations, info = self.env.reset()
         b_actions = [[] for _ in range(num_envs)]
         b_states = [[] for _ in range(num_envs)]
         b_rewards = [[] for _ in range(num_envs)]
