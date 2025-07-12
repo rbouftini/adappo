@@ -148,7 +148,7 @@ class ContinuousAgent(ABC):
     def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs):
         pass
 
-    def train(self, episodes,num_envs, discount=0.99, gae_lambda=0.97, clip_epsilon=0.2, max_lr=3e-4, warmup_steps= 20, warmdown_steps=0):
+    def train(self, episodes,num_envs, discount=0.99, gae_lambda=0.95, clip_epsilon=0.2, max_lr=3e-4, warmup_steps= 20, warmdown_steps=0):
         saved_rewards = []
         for episode in range(episodes):
             b_actions, b_states, b_rewards, b_logprobs, b_values = self.collect_trajectories(num_envs)
