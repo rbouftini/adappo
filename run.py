@@ -11,6 +11,7 @@ import argparse
 import new
 import ppo
 import warnings
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--alg", help="Testing Algorithm", 
@@ -25,10 +26,11 @@ warnings.filterwarnings("ignore", message="CUDA initialization: Found no NVIDIA 
 def make_wrapped_env():
     def _init():
         env = gym.make(args.env, render_mode="rgb_array")
-        env = gym.wrappers.ClipAction(env)
-        env = gym.wrappers.NormalizeObservation(env)
-        env = gym.wrappers.TransformObservation(env, lambda obs: np.clip(obs, -10, 10),
-                                                observation_space= env.observation_space)
+        if not isinstance(env.action_space, gym.spaces.discrete.Discrete):
+          env = gym.wrappers.ClipAction(env)
+          env = gym.wrappers.NormalizeObservation(env)
+          env = gym.wrappers.TransformObservation(env, lambda obs: np.clip(obs, -10, 10),
+                                                  observation_space= env.observation_space)
 
         return env
     return _init
@@ -36,8 +38,8 @@ def make_wrapped_env():
 rewards = []
 print(f"Running {args.alg.upper()} on {args.env} task for {args.num_eps} episodes")
 num_envs = 8
-np.random.seed(42)
-seeds = np.random.randint(1000, size=4)
+np.random.seed(21)
+seeds = np.random.randint(1000, size=5)
 
 for seed in seeds:
   env_fns = [make_wrapped_env() for i in range(num_envs)]
@@ -51,3 +53,12 @@ for seed in seeds:
     agent, policy, value = ppo.create_agent(envs)
 
   rewards.append(agent.train(episodes=args.num_eps, num_envs= num_envs))
+
+df = pd.DataFrame()
+for reward in rewards:
+  df = pd.concat([df, pd.DataFrame(reward, columns=["Y"])])
+df = df.reset_index(drop=False, names="X")
+
+path = "experiments/" + args.env
+os.makedirs(path, exist_ok=True)
+df.to_csv(f"{path}/{args.alg}")
