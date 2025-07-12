@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from DiscreteAgent import DiscreteAgent, DiscretePolicy, Value
-from ContinuousAgent import ContinuousAgent, ContinuousPolicy
+from agent.DiscreteAgent import DiscreteAgent, DiscretePolicy, Value
+from agent.ContinuousAgent import ContinuousAgent, ContinuousPolicy
 from gymnasium import spaces
 
 def create_agent(envs):

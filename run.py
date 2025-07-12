@@ -8,8 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import argparse
-import new
-import ppo
+from algo import new, ppo
 import warnings
 import os
 
@@ -61,4 +60,4 @@ df = df.reset_index(drop=False, names="X")
 
 path = "experiments/" + args.env
 os.makedirs(path, exist_ok=True)
-df.to_csv(f"{path}/{args.alg}")
+df.to_csv(f"{path}/{args.alg}.txt")
