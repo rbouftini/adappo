@@ -27,9 +27,9 @@ class ContinuousPolicy(nn.Module):
 class Value(nn.Module):
     def __init__(self, envs):
         super().__init__()
-        self.l1 = layer_init(nn.Linear(envs.single_observation_space.shape[0], 64, bias=True))
-        self.l2 = layer_init(nn.Linear(64, 64, bias=True))
-        self.l3 = layer_init(nn.Linear(64, 1, bias=True), std=1.)
+        self.l1 = layer_init(nn.Linear(envs.single_observation_space.shape[0], 256, bias=True))
+        self.l2 = layer_init(nn.Linear(256, 256, bias=True))
+        self.l3 = layer_init(nn.Linear(256, 1, bias=True), std=1.)
 
     def forward(self, x):
         x = F.relu(self.l1(x))
@@ -43,7 +43,7 @@ class ContinuousAgent(ABC):
         self.policy = policy
         self.value = value
         self.optimizer_policy = torch.optim.Adam(self.policy.parameters())
-        self.optimizer_value = torch.optim.Adam(self.value.parameters(), lr=1e-3)
+        self.optimizer_value = torch.optim.Adam(self.value.parameters(), lr=8e-4)
 
     def play(self):
         observation, info = self.env.reset()
@@ -148,7 +148,7 @@ class ContinuousAgent(ABC):
     def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs):
         pass
 
-    def train(self, episodes,num_envs, discount=0.99, gae_lambda=0.95, clip_epsilon=0.2, max_lr=3e-4, warmup_steps= 20, warmdown_steps=0):
+    def train(self, episodes,num_envs, discount=0.99, gae_lambda=0.97, clip_epsilon=0.2, max_lr=3e-4, warmup_steps=40, warmdown_steps=0):
         saved_rewards = []
         for episode in range(episodes):
             b_actions, b_states, b_rewards, b_logprobs, b_values = self.collect_trajectories(num_envs)
