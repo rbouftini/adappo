@@ -13,7 +13,7 @@ def create_agent(envs):
 
   value = Value(envs)
 
-  class PPOAgent(Agent):
+  class TRPOAgent(Agent):
     def __init__(self, envs, policy, value):
       super().__init__(envs, policy, value)
 
@@ -22,9 +22,6 @@ def create_agent(envs):
         policy_loss = 0
         value_loss = 0
         for actions, states, logprobs, advantages, rewards in zip(b_actions, b_states, b_logprobs, b_advantages, b_rewards):
-          # Get new log-probabilities and values for the batch
-          _, new_logprobs, new_values = self.get_action_value(torch.cat(states, dim=0), torch.stack(actions))
-
           # Compute the ratio of new to old probabilities
           ratio = torch.exp(new_logprobs - torch.cat(logprobs, dim=0).detach())
           clip_epsilon = 0.2
@@ -34,6 +31,7 @@ def create_agent(envs):
 
           # Compute the policy loss (PPO objective)
           loss = -torch.min(clipped_ratio * advantages, ratio * advantages) 
+          loss = - ratio * advantages
           policy_loss += loss.sum() / len(b_actions)
 
           # Compute the value loss (Mean Squared Error)
@@ -53,4 +51,4 @@ def create_agent(envs):
         nn.utils.clip_grad_norm_(self.value.parameters(), 1)
         self.optimizer_value.step()
 
-  return PPOAgent(envs, policy, value), policy, value
+  return TRPOAgent(envs, policy, value), policy, value

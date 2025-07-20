@@ -36,7 +36,7 @@ def make_wrapped_env():
 
 rewards = []
 print(f"Running {args.alg.upper()} on {args.env} task for {args.num_eps} episodes")
-num_envs = 8
+num_envs = 16
 np.random.seed(21)
 seeds = np.random.randint(1000, size=5)
 
