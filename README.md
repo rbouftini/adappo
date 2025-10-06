@@ -61,12 +61,12 @@ Follow these steps to get up and running:
    usage: run.py [-h] [--alg {adappo,ppo,trpo}] [--env ENV] [--num-eps NUM_EPS] [--num-eps NUM_EPS] [--num-envs NUM_ENVS] [--delta DELTA]
 
    optional arguments:
-     -h, --help         show this help message and exit
+     -h, --help                 show this help message and exit
      --alg {adappo,ppo,trpo}    Testing Algorithm
-     --env ENV          Environment id (e.g. LunarLander-v3)
-     --num-eps NUM_EPS  Number of episodes
-     --num-envs NUM_ENVS Number of parallel environements
-     --delta DELTA Threshold delta value
+     --env ENV                  Environment id (e.g. LunarLander-v3)
+     --num-eps NUM_EPS          Number of episodes
+     --num-envs NUM_ENVS        Number of parallel environements
+     --delta DELTA              Threshold delta value
    ```
 
 ## Repository Structure
@@ -80,8 +80,8 @@ ppoh/
 ├── requirements.txt        # Python dependencies
 └── run.py                  # Script for running experiments
 ├── agent/
-    ├── ContinuousAgent.py      # Agent for continuous-action environments
-    ├── DiscreteAgent.py        # Agent for discrete-action environments
+    ├── ContinuousAgent.py        # Agent for continuous-action environments
+    ├── DiscreteAgent.py          # Agent for discrete-action environments
 ├── algo/
     ├── adappo.py               # AdaPPO specific algorithm implementation
     ├── ppo.py                  # Vanilla PPO implementation
