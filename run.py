@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import argparse
-from algo import new, ppo, trpo
+from algo import adappo, ppo, trpo
 import warnings
 import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--alg", help="Testing Algorithm", 
-                    choices=["new", "ppo", "trpo"], default="new")
+                    choices=["adappo", "ppo", "trpo"], default="adappo")
 parser.add_argument("--env", help="Environment id (eg. LunarLander-v3)",
                     default="LunarLander-v3")
 parser.add_argument("--num-eps", help="Number of episodes",
@@ -50,8 +50,8 @@ for seed in seeds:
   _ = envs.reset(seed=[int(seed) + i for i in range(num_envs)])
   torch.manual_seed(seed)
   
-  if args.alg == "new":
-    agent, policy, value = new.create_agent(envs, args.delta)
+  if args.alg == "adappo":
+    agent, policy, value = adappo.create_agent(envs, args.delta)
   elif args.alg =="ppo":
     agent, policy, value = ppo.create_agent(envs)
   else:
