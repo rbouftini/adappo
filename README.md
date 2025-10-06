@@ -63,9 +63,11 @@ Follow these steps to get up and running:
 
    optional arguments:
      -h, --help         show this help message and exit
-     --alg {new,ppo}    Testing Algorithm
+     --alg {adappo,ppo}    Testing Algorithm
      --env ENV          Environment id (e.g. LunarLander-v3)
      --num-eps NUM_EPS  Number of episodes
+     --num-envs NUM_ENVS Number of parallel environements
+     --delta DELTA Threshold delta value
    ```
 
 ## Repository Structure
@@ -74,14 +76,17 @@ Follow these steps to get up and running:
 ppoh/
 ├── .dockerignore
 ├── .gitignore
-├── ContinuousAgent.py      # Agent for continuous-action environments
-├── DiscreteAgent.py        # Agent for discrete-action environments
 ├── Dockerfile              # Docker instructions file
 ├── README.md               # (this file)
-├── new.py                  # PPOH-specific algorithm implementation
-├── ppo.py                  # Vanilla PPO implementation
 ├── requirements.txt        # Python dependencies
 └── run.py                  # Script for running experiments
+├── agent/
+    ├── ContinuousAgent.py      # Agent for continuous-action environments
+    ├── DiscreteAgent.py        # Agent for discrete-action environments
+├── algo/
+    ├── adappo.py               # AdaPPO specific algorithm implementation
+    ├── ppo.py                  # Vanilla PPO implementation
+    ├── trpo.py                 # TRPO implementation
 ```
 
 ## License
