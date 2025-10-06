@@ -5,7 +5,7 @@ from agent.DiscreteAgent import DiscreteAgent, DiscretePolicy, Value
 from agent.ContinuousAgent import ContinuousAgent, ContinuousPolicy
 from gymnasium import spaces
 
-def create_agent(envs):
+def create_agent(envs, delta):
   if isinstance(envs.single_action_space , spaces.discrete.Discrete):
     Agent, policy = DiscreteAgent, DiscretePolicy(envs)
   else:
@@ -14,8 +14,9 @@ def create_agent(envs):
   value = Value(envs)
 
   class NewAgent(Agent):
-    def __init__(self, envs, policy, value):
+    def __init__(self, envs, policy, value, delta):
       super().__init__(envs, policy, value)
+      self.delta = delta
 
     def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs=100):
       for epoch in range(epochs):
@@ -47,7 +48,7 @@ def create_agent(envs):
           rewards, new_values = rewards[perm], new_values[perm]
           value_loss += F.mse_loss(rewards.unsqueeze(1), new_values) / len(b_actions)
 
-        if avg_kl > 2:
+        if avg_kl > self.delta:
           break
 
         # Backpropagate and update policy network
@@ -62,4 +63,4 @@ def create_agent(envs):
         nn.utils.clip_grad_norm_(self.value.parameters(), 1)
         self.optimizer_value.step()
   
-  return NewAgent(envs, policy, value), policy, value 
+  return NewAgent(envs, policy, value, delta), policy, value 

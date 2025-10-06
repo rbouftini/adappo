@@ -8,17 +8,21 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import argparse
-from algo import new, ppo
+from algo import new, ppo, trpo
 import warnings
 import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--alg", help="Testing Algorithm", 
-                    choices=["new", "ppo"], default="new")
+                    choices=["new", "ppo", "trpo"], default="new")
 parser.add_argument("--env", help="Environment id (eg. LunarLander-v3)",
                     default="LunarLander-v3")
 parser.add_argument("--num-eps", help="Number of episodes",
                     default="100", type=int)
+parser.add_argument("--num-envs", help="Number of parallel environnements",
+                    default="16", type=int)
+parser.add_argument("--delta", help="Threshold delta value",
+                    default="1.8", type=float)                  
 args = parser.parse_args()
 warnings.filterwarnings("ignore", message="CUDA initialization: Found no NVIDIA driver on your system")
 
@@ -36,8 +40,8 @@ def make_wrapped_env():
 
 rewards = []
 print(f"Running {args.alg.upper()} on {args.env} task for {args.num_eps} episodes")
-num_envs = 16
-np.random.seed(21)
+num_envs = args.num_envs
+np.random.seed(42)
 seeds = np.random.randint(1000, size=5)
 
 for seed in seeds:
@@ -47,9 +51,11 @@ for seed in seeds:
   torch.manual_seed(seed)
   
   if args.alg == "new":
-    agent, policy, value = new.create_agent(envs)
-  else:
+    agent, policy, value = new.create_agent(envs, args.delta)
+  elif args.alg =="ppo":
     agent, policy, value = ppo.create_agent(envs)
+  else:
+    agent, policy, value = trpo.create_agent(envs)
 
   rewards.append(agent.train(episodes=args.num_eps, num_envs= num_envs))
 
@@ -58,6 +64,4 @@ for reward in rewards:
   df = pd.concat([df, pd.DataFrame(reward, columns=["Y"])])
 df = df.reset_index(drop=False, names="X")
 
-path = "experiments/" + args.env
-os.makedirs(path, exist_ok=True)
-df.to_csv(f"{path}/{args.alg}.txt")
+df.to_csv(f"pi'_pi.txt")

@@ -16,8 +16,8 @@ def create_agent(envs):
   value = Value(envs)
 
   class TRPOAgent(Agent):
-      def __init__(self, envs, policy, value, cg_iters=10, cg_damping=1e-2, max_kl=0.01, backtrack_coeff=0.5,
-                  backtrack_iters=10):
+      def __init__(self, envs, policy, value, cg_iters=5, cg_damping=1e-3, max_kl=0.01, backtrack_coeff=0.1,
+                  backtrack_iters=5):
           super().__init__(envs, policy, value)
           self.cg_iters = cg_iters
           self.cg_damping = cg_damping
@@ -51,7 +51,6 @@ def create_agent(envs):
           return x
 
       def compute_total_kl(self, b_actions, b_states, b_logprobs):
-          # sum-then-average for KL
           kl_sum = 0.0
           n = 0
           for actions, states, logprobs in zip(b_actions, b_states, b_logprobs):
@@ -95,7 +94,7 @@ def create_agent(envs):
               step_size = 1e-10
           full_step = step_size * natural_grad
 
-          # save old params for freeze
+          # save old params
           old_params = parameters_to_vector(self.policy.parameters()).clone()
 
           # backtracking line search
@@ -107,7 +106,6 @@ def create_agent(envs):
 
               kl_new = self.compute_total_kl(b_actions, b_states, b_logprobs)
               loss_new = self.compute_policy_loss(b_actions, b_states, b_logprobs, b_advantages)
-              # enforce trust-region and improvement
               if kl_new <= max_kl and loss_new >= policy_loss + 1e-4 * frac:
                   best_params = new_params.clone()
                   break
@@ -119,7 +117,6 @@ def create_agent(envs):
             value_loss = 0.0
             for rewards, states, actions in zip(b_rewards, b_states, b_actions):
                 _, _, new_values = self.get_action_value(torch.cat(states, dim=0), torch.stack(actions))
-                # shuffle for minibatch stability
                 perm = torch.randperm(len(rewards))
                 value_loss += F.mse_loss(rewards[perm].unsqueeze(1), new_values[perm]) / len(b_actions)
 

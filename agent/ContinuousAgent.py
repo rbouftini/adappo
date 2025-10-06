@@ -35,7 +35,7 @@ class Value(nn.Module):
         x = F.relu(self.l1(x))
         x = F.relu(self.l2(x))
         x = self.l3(x)
-        return x  # Output the estimated value of the state
+        return x 
 
 class ContinuousAgent(ABC):
     def __init__(self, envs, policy, value):

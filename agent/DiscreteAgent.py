@@ -141,7 +141,7 @@ class DiscreteAgent(ABC):
     def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs):
         pass
 
-    def train(self, episodes,num_envs, discount=0.99, gae_lambda=0.97, max_lr=3e-4, warmup_steps= 40, warmdown_steps=20):
+    def train(self, episodes,num_envs, discount=0.99, gae_lambda=0.97, max_lr=3e-4, warmup_steps= 20, warmdown_steps=20):
         saved_rewards = []
         for episode in range(episodes):
             b_actions, b_states, b_rewards, b_logprobs, b_values = self.collect_trajectories(num_envs)
