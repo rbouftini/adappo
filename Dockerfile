@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-WORKDIR /ppoh
+WORKDIR /adappo
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
