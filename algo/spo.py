@@ -32,9 +32,7 @@ def create_agent(envs, epochs, epsilon, max_lr, max_grad_norm):
         policy_loss = 0.0
         value_loss = 0.0
 
-        for actions, states, logprobs, advantages, rewards in zip(
-              b_actions, b_states, b_logprobs, b_advantages, b_rewards):
-
+        for actions, states, logprobs, advantages, rewards in zip(b_actions, b_states, b_logprobs, b_advantages, b_rewards):
           states_cat = torch.cat(states, dim=0)
           actions_cat = torch.stack(actions)
           old_logprobs = torch.cat(logprobs, dim=0).detach()
@@ -43,7 +41,7 @@ def create_agent(envs, epochs, epsilon, max_lr, max_grad_norm):
           # Policy Evaluation
           _, new_logprobs, new_values = self.get_action_value(states_cat, actions_cat)
 
-          ratios = torch.exp(new_logprobs - old_logprobs)  # [T]
+          ratios = torch.exp(new_logprobs - old_logprobs)
 
           # SPO surrogate objective
           quad_penalty = (ratios - 1.0) ** 2

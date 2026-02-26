@@ -14,9 +14,9 @@ def layer_init(module, std=np.sqrt(2)):
 class ContinuousPolicy(nn.Module):
     def __init__(self, envs):
         super().__init__()
-        self.l1 = layer_init(nn.Linear(envs.single_observation_space.shape[0], 256, bias=True))  # Input is 8 dimentional (8 states)
+        self.l1 = layer_init(nn.Linear(envs.single_observation_space.shape[0], 256, bias=True))
         self.l2 = layer_init(nn.Linear(256, 256, bias=True))
-        self.l3 = layer_init(nn.Linear(256, envs.single_action_space.shape[0], bias=True), std=0.01)  # Output layer (2 means)
+        self.l3 = layer_init(nn.Linear(256, envs.single_action_space.shape[0], bias=True), std=0.01)
         self.logstds = nn.Parameter(torch.zeros(1,envs.single_action_space.shape[0]))
 
     def forward(self, x):

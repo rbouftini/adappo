@@ -33,9 +33,7 @@ def create_agent(envs, epochs, delta, max_lr, max_grad_norm):
                 total_abs_dev = 0.0
                 total_count = 0
 
-                for actions, states, logprobs, advantages, rewards in zip(
-                    b_actions, b_states, b_logprobs, b_advantages, b_rewards):
-
+                for actions, states, logprobs, advantages, rewards in zip(b_actions, b_states, b_logprobs, b_advantages, b_rewards):
                     states_cat = torch.cat(states, dim=0)
                     actions_cat = torch.stack(actions)
                     old_logprobs = torch.cat(logprobs, dim=0).detach()

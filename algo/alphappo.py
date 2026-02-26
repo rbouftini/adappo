@@ -26,9 +26,7 @@ def create_agent(envs, epochs, alpha, beta, max_lr, max_grad_norm):
                 policy_loss = 0.0
                 value_loss = 0.0
 
-                for actions, states, logprobs, advantages, rewards in zip(
-                        b_actions, b_states, b_logprobs, b_advantages, b_rewards):
-
+                for actions, states, logprobs, advantages, rewards in zip(b_actions, b_states, b_logprobs, b_advantages, b_rewards):
                     states_cat = torch.cat(states, dim=0)
                     actions_cat = torch.stack(actions)
                     old_logprobs = torch.cat(logprobs, dim=0).detach()
