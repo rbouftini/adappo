@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from abc import ABC, abstractmethod
+import math
 
 def layer_init(module, std=np.sqrt(2)):
     torch.nn.init.orthogonal_(module.weight, std)
@@ -12,9 +13,9 @@ def layer_init(module, std=np.sqrt(2)):
 class DiscretePolicy(nn.Module):
     def __init__(self, envs):
         super().__init__()
-        self.l1 = layer_init(nn.Linear(envs.single_observation_space.shape[0], 64, bias=True))  # Input is 8 dimentional (8 states)
-        self.l2 = layer_init(nn.Linear(64, 64, bias=True))
-        self.l3 = layer_init(nn.Linear(64, envs.single_action_space.n, bias=True), std=0.01)  # Output layer (4 possible actions)
+        self.l1 = layer_init(nn.Linear(envs.single_observation_space.shape[0], 256, bias=True))
+        self.l2 = layer_init(nn.Linear(256, 256, bias=True))
+        self.l3 = layer_init(nn.Linear(256, envs.single_action_space.n, bias=True), std=0.01)
 
     def forward(self, x):
         x = torch.tanh(self.l1(x))
@@ -36,10 +37,11 @@ class Value(nn.Module):
         return x  # Output the estimated value of the state
     
 class DiscreteAgent(ABC):
-    def __init__(self, envs, policy, value):
+    def __init__(self, envs, policy, value, max_lr):
         self.env = envs
         self.policy = policy
         self.value = value
+        self.max_lr = max_lr
         self.optimizer_policy = torch.optim.Adam(self.policy.parameters())
         self.optimizer_value = torch.optim.Adam(self.value.parameters(), lr= 8e-4)
 
@@ -60,17 +62,18 @@ class DiscreteAgent(ABC):
 
         self.env.close()
 
-    def get_lr(self, it, max_lr, warmup_steps, warmdown_steps, max_steps):
+    def get_lr(self, it, warmup_steps, warmdown_steps, max_lr,  min_lr):
       # 1) linear warmup for warmup_iters steps
       if it < warmup_steps:
           return max_lr * (it+1) / warmup_steps
       # 2) Stable learning rate
-      if it < max_steps - warmdown_steps:
-          return max_lr
+      if it > warmdown_steps:
+          return min_lr
       # 3) Decay learning rate
       else:
-        decay_ratio = (max_steps - it) / warmdown_steps
-        return max_lr * decay_ratio
+        decay_ratio = (it- warmup_steps) / (warmdown_steps-warmup_steps)
+        coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
+        return min_lr + coeff * (max_lr - min_lr)
 
     def get_action_value(self, observation, action=None):
         probs = self.policy(observation)
@@ -85,7 +88,7 @@ class DiscreteAgent(ABC):
         b_returns = []
 
         for rewards, values in zip(b_rewards, b_values):
-            values = torch.tensor(values)
+            values = torch.cat(values).detach()
             rewards = torch.tensor(rewards, dtype=torch.float32)
             advantages = torch.zeros_like(rewards)
             lastgae = 0.0
@@ -107,7 +110,7 @@ class DiscreteAgent(ABC):
         return b_advantages, b_returns
 
     def collect_trajectories(self, num_envs):
-        observations, info = self.env.reset()
+        observations, _ = self.env.reset()
         b_actions = [[] for _ in range(num_envs)]
         b_states = [[] for _ in range(num_envs)]
         b_rewards = [[] for _ in range(num_envs)]
@@ -141,7 +144,7 @@ class DiscreteAgent(ABC):
     def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs):
         pass
 
-    def train(self, episodes, num_envs, discount=0.99, gae_lambda=0.97, max_lr=3e-4, warmup_steps= 20, warmdown_steps=20):
+    def train(self, episodes, num_envs, discount=0.99, gae_lambda=0.97, warmup_steps= 20, warmdown_steps=0):
         saved_rewards = []
         for episode in range(episodes):
             b_actions, b_states, b_rewards, b_logprobs, b_values = self.collect_trajectories(num_envs)
@@ -154,7 +157,7 @@ class DiscreteAgent(ABC):
             # Compute advantages and update networks
             b_advantages, b_rewards = self.compute_gaes(b_rewards, b_values, discount, gae_lambda)
 
-            lr  = self.get_lr(episode, max_lr, warmup_steps, warmdown_steps, episodes)
+            lr  = self.get_lr(episode, warmup_steps, warmdown_steps, self.max_lr, self.max_lr)
             self.optimizer_policy.param_groups[0]['lr'] = lr
             print(f"Episode: {episode+1}, Total Rewards: {total_rewards:.4f}, lr:{lr:.4e}")
 

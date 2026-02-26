@@ -5,7 +5,7 @@ from agent.DiscreteAgent import DiscreteAgent, DiscretePolicy, Value
 from agent.ContinuousAgent import ContinuousAgent, ContinuousPolicy
 from gymnasium import spaces
 
-def create_agent(envs):
+def create_agent(envs, epochs, clip_epsilon, max_lr, max_grad_norm):
   if isinstance(envs.single_action_space , spaces.discrete.Discrete):
     Agent, policy = DiscreteAgent, DiscretePolicy(envs)
   else:
@@ -14,11 +14,14 @@ def create_agent(envs):
   value = Value(envs)
 
   class PPOAgent(Agent):
-    def __init__(self, envs, policy, value):
-      super().__init__(envs, policy, value)
+    def __init__(self, envs, policy, value, epochs, clip_epsilon, max_lr, max_grad_norm):
+      super().__init__(envs, policy, value, max_lr)
+      self.epochs = epochs
+      self.clip_epsilon = clip_epsilon
+      self.max_grad_norm = max_grad_norm
 
-    def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs=15):
-      for epoch in range(epochs):
+    def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards):
+      for _ in range(int(self.epochs)):
         policy_loss = 0
         value_loss = 0
         for actions, states, logprobs, advantages, rewards in zip(b_actions, b_states, b_logprobs, b_advantages, b_rewards):
@@ -27,10 +30,9 @@ def create_agent(envs):
 
           # Compute the ratio of new to old probabilities
           ratio = torch.exp(new_logprobs - torch.cat(logprobs, dim=0).detach())
-          clip_epsilon = 0.2
 
           # Clip the ratio to control policy updates
-          clipped_ratio = torch.clamp(ratio, 1 - clip_epsilon, 1 + clip_epsilon)
+          clipped_ratio = torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon)
 
           # Compute the policy loss (PPO objective)
           loss = -torch.min(clipped_ratio * advantages, ratio * advantages) 
@@ -44,7 +46,7 @@ def create_agent(envs):
         # Backpropagate and update policy network
         self.optimizer_policy.zero_grad()
         policy_loss.backward()
-        nn.utils.clip_grad_norm_(self.policy.parameters(), 1)
+        nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
         self.optimizer_policy.step()
 
         # Backpropagate and update value network
@@ -53,4 +55,4 @@ def create_agent(envs):
         nn.utils.clip_grad_norm_(self.value.parameters(), 1)
         self.optimizer_value.step()
 
-  return PPOAgent(envs, policy, value), policy, value
+  return PPOAgent(envs, policy, value, epochs, clip_epsilon, max_lr, max_grad_norm), policy, value
