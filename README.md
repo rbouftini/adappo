@@ -19,7 +19,7 @@ Follow these steps to get up and running:
 1. **Clone the repository**
 
    ```bash
-   git clone ...
+   git clone https://github.com/rbouftini/adappo.git
    cd adappo
    ```
 
