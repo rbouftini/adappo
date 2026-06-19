@@ -1,13 +1,13 @@
 # Decoupling Proximal Policy Optimization Hyperparameters
 
-This repository implements a modification of [Proximal Policy Optimization (PPO)](https://arxiv.org/abs/1707.06347) that constrains the divergence between the trajectory distributions induced by the old and new policies. A single trajectory-divergence criterion governs the optimization and decouples PPO's main hyperparameters — the learning rate, number of epochs, and clipping range — improving training stability and final performance with only minimal changes to the algorithm.
+This repository implements a modification of [Proximal Policy Optimization (PPO)](https://arxiv.org/abs/1707.06347) that constrains the divergence between the trajectory distributions induced by the old and new policies. A single trajectory-divergence criterion governs the optimization and decouples PPO's main hyperparameters--the learning rate, number of epochs, and clipping range--improving training stability and final performance with only minimal changes to the algorithm.
 
 Alongside the proposed method, the repository provides a suite of policy-gradient baselines under a common interface.
 
 ## Features
 
 * **Single-criterion control**: a trajectory-divergence threshold replaces manual tuning of the learning rate, number of epochs, and clipping range.
-* **Nine algorithms, one interface**:PPO plus eight policy-gradient baselines, selectable with a single flag.
+* **Nine algorithms, one interface**: PPO plus eight policy-gradient baselines, selectable with a single flag.
 * **Parallel multi-seed runs**: each algorithm trains across several seeds and environments in parallel and reports the mean reward per episode.
 * **Reproducible and containerized**: pinned dependencies and a Docker image for one-command setup.
 
