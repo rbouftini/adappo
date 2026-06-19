@@ -15,8 +15,8 @@ Choose an algorithm with `--alg`:
 | `--alg`    | Method                                                                 | Key hyperparameters |
 |------------|------------------------------------------------------------------------|---------------------|
 | `adappo`   | Trajectory-divergence criterion with KL-based early stopping (**this work**) | `--delta` |
-| `ppo`      | PPO — clipped surrogate objective                                      | `--clip-epsilon`, `--epochs` |
-| `trpo`     | TRPO — natural gradient via conjugate gradient with line search        | `--max-kl`, `--cg-iters`, `--cg-damping`, `--backtrack-coeff`, `--backtrack-iters` |
+| `ppo`      | PPO clipped surrogate objective                                      | `--clip-epsilon`, `--epochs` |
+| `trpo`     | TRPO natural gradient via conjugate gradient with line search        | `--max-kl`, `--cg-iters`, `--cg-damping`, `--backtrack-coeff`, `--backtrack-iters` |
 | `espo`     | Early stopping on the mean probability-ratio deviation                 | `--delta`, `--epochs` |
 | `spo`      | Quadratic-penalty surrogate                                           | `--epsilon`, `--epochs` |
 | `alphappo` | α-divergence-regularized surrogate                                    | `--alpha`, `--beta`, `--epochs` |
