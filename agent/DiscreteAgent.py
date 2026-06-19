@@ -144,7 +144,7 @@ class DiscreteAgent(ABC):
     def update_policy_value(self, b_actions, b_states, b_logprobs, b_advantages, b_rewards, epochs):
         pass
 
-    def train(self, episodes, num_envs, discount=0.99, gae_lambda=0.97, warmup_steps= 20, warmdown_steps=0):
+    def train(self, episodes, num_envs, discount=0.99, gae_lambda=0.97, warmup_steps= 20, warmdown_steps=0, reporter=None, seed=None):
         saved_rewards = []
         for episode in range(episodes):
             b_actions, b_states, b_rewards, b_logprobs, b_values = self.collect_trajectories(num_envs)
@@ -159,7 +159,11 @@ class DiscreteAgent(ABC):
 
             lr  = self.get_lr(episode, warmup_steps, warmdown_steps, self.max_lr, self.max_lr)
             self.optimizer_policy.param_groups[0]['lr'] = lr
-            print(f"Episode: {episode+1}, Total Rewards: {total_rewards:.4f}, lr:{lr:.4e}")
+            # Report to the parent for cross-seed averaging, else print directly.
+            if reporter is not None:
+                reporter.put((seed, episode + 1, total_rewards))
+            else:
+                print(f"Episode: {episode+1}, Total Rewards: {total_rewards:.4f}, lr:{lr:.4e}")
 
             self.update_policy_value(b_actions, b_states, b_logprobs, b_advantages, b_rewards)
 
