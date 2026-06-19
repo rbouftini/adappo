@@ -46,7 +46,7 @@ The agent is chosen automatically from the environment's action space: a categor
    docker build -t adappo .
    ```
 
-3. **Start a container with a shell** — bind-mounts the repository so local edits are picked up:
+3. **Start a Docker container with a Bash session**
 
    * **macOS/Linux**
 
@@ -60,7 +60,7 @@ The agent is chosen automatically from the environment's action space: a categor
      docker run -it --mount "type=bind,src=$($pwd),target=/adappo" adappo bash
      ```
 
-4. **Run an experiment** — inside the container:
+4. **Run an experiment**
 
    ```bash
    python run.py --alg adappo --env LunarLander-v3 --num-eps 100 --num-seeds 10
